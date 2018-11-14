@@ -69,17 +69,12 @@ class SunscreenDataExctractor(object):
         beautytap_crawler = Crawler("beautytap")
         products = list()
 
-        i = 0
         for product_html in beautytap_crawler.crawl():
             try:
                 results = self.parse_product(product_html)
                 products.append(results)
             except SunscreenException as err:
                 print(str(err))
-
-            if i > 4:
-                break
-            i += 1
 
         self.create_csv(products)
 
