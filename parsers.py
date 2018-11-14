@@ -137,6 +137,10 @@ class SkinCharismaParser(Parser):
                     product_analysis["actives"].append(uv_filter_name)
                     filter_types.add(uv_filter_type)
 
+                    # i want to extract some of the most harmful / non photostable components to include them in my score
+                    if uv_filter_name in product_analysis:
+                        product_analysis[uv_filter_name] = True
+
         product_analysis["nb_ingredients"] = nb_ingredients
 
         if len(product_analysis["actives"]) == 0:
