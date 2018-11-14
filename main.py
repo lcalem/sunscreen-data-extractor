@@ -1,4 +1,6 @@
+import os
 import requests
+import sys
 import urllib.parse
 
 from pprint import pprint
@@ -9,9 +11,10 @@ from parsers import BeautytapParser, SkinCharismaParser, SunscreenException
 
 class SunscreenDataExctractor(object):
 
-    def __init__(self):
+    def __init__(self, output_path=None):
         self.beautytap_parser = BeautytapParser()
         self.skincharisma_parser = SkinCharismaParser()
+        self.output_path = output_path if output_path else "sunscreen_results.csv"
 
     def build_analysis_url(self, raw_ingredients):
         base_url = "https://www.skincarisma.com/products/analyze"
@@ -64,13 +67,51 @@ class SunscreenDataExctractor(object):
 
     def extract_sunscreens(self):
         beautytap_crawler = Crawler("beautytap")
+        products = list()
 
+        i = 0
         for product_html in beautytap_crawler.crawl():
             try:
                 results = self.parse_product(product_html)
-                pprint(results)
+                products.append(results)
             except SunscreenException as err:
                 print(str(err))
+
+            if i > 4:
+                break
+            i += 1
+
+        self.create_csv(products)
+
+    def create_csv(self, product_results):
+        sorted_products = sorted(product_results, key=lambda x: x["score40"], reverse=True)
+
+        with open(self.output_path, "w+") as f_out:
+            f_out.write(";".join(["product name", "type", "SPF", "UVA", "score40", "actives", "nb ingredients", "INCI", "ewg safe", "ewg moderate", "ewg hazard", "ewg unknown", "alcohol", "avobenzone", "octocylene", "octinoxate", "fragrance"]) + "\n")
+            
+            for product in sorted_products:
+                csv_parts = list()
+                csv_parts.append(product["product_name"])
+                csv_parts.append(product["analysis"]["type"])
+                csv_parts.append("NA")       # TODO
+                csv_parts.append("NA")       # TODO
+                csv_parts.append(str(product["score40"]))
+                csv_parts.append(",".join(product["analysis"]["actives"]))
+                csv_parts.append(str(product["analysis"]["nb_ingredients"]))
+                csv_parts.append(product["INCI"].strip().replace(" ", ""))
+                csv_parts.append(str(product["analysis"]["ewg_safety"][0]))
+                csv_parts.append(str(product["analysis"]["ewg_safety"][1]))
+                csv_parts.append(str(product["analysis"]["ewg_safety"][2]))
+                csv_parts.append(str(product["analysis"]["ewg_safety"][3]))
+                csv_parts.append("yes" if product["analysis"]["alcohol"] else "no")
+                csv_parts.append("yes" if product["analysis"]["avobenzone"] else "no")
+                csv_parts.append("yes" if product["analysis"]["octocrylene"] else "no")
+                csv_parts.append("yes" if product["analysis"]["octinoxate"] else "no")
+                csv_parts.append("yes" if product["analysis"]["fragrance"] else "no")
+
+                f_out.write(";".join(csv_parts) + "\n")
+
+        print("Saved sunscreen data at %s" % self.output_path)
 
 
 def main():
@@ -80,6 +121,7 @@ def main():
     '''
     extractor = SunscreenDataExctractor()
     extractor.extract_sunscreens()
+
 
 if __name__ == '__main__':
     main()

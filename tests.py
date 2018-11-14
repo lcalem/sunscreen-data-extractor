@@ -48,9 +48,6 @@ def test_product():
     assert len(product_results["INCI"]) > 0
     assert product_results["product_name"] == "A’Pieu Pure Block Aqua Sun Gel 50ml"
     assert product_results["score40"] > 0
-
-    from pprint import pprint
-    pprint(product_results["analysis"])
     assert dict_equal(product_results["analysis"], expected_analysis)
 
     

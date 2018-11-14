@@ -70,7 +70,7 @@ class SkinCharismaParser(Parser):
             "ethylhexyl triazone": ("uvinul t 150", "organic"),
             "mexoryl xl": ("mexoryl xl", "organic"),
             "zinc oxide": ("zinc oxide", "inorganic"),
-            "titanium oxide": ("titanium oxide", "inorganic"),
+            "titanium dioxide": ("titanium dioxide", "inorganic"),
             "parsol slx": ("polysilicone-15", "organic"),
             "polysilicone-15": ("polysilicone-15", "organic"),
             "dioxybenzone": ("dioxybenzone", "organic"),
